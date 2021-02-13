@@ -1,5 +1,5 @@
 
-hello.aux
-hello.log
-hello.pdf
-hello.synctex.gz
+*.aux
+*.log
+*.pdf
+*.synctex.gz
