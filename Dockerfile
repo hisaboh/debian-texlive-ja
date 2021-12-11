@@ -1,4 +1,4 @@
-FROM debian:10-slim
+FROM debian:11.1-slim
 LABEL maintainer="hisaboh@gmail.com"
 
 ENV TL_VERSION=2021
@@ -9,16 +9,15 @@ WORKDIR /tmp
 
 # Install required packages
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    # Basic tools
-    wget unzip ghostscript \
-    # for tlmgr
-    perl-modules-5.28 \
-    # for XeTeX
-    fontconfig && \
-    # Clean caches
-    apt-get autoremove -y && \
+    apt-get upgrade -y
+# Basic tools
+RUN apt-get install -y wget unzip ghostscript
+# for tlmgr
+RUN apt-get install -y perl-modules-5.32
+# for XeTeX
+RUN apt-get install -y fontconfig
+# Clean caches
+RUN apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
@@ -35,18 +34,6 @@ RUN printf "%s\n" \
 RUN ./install-tl-unx/install-tl \
       -profile ./install-tl-unx/texlive.profile
 RUN rm -rf *
-# RUN mkdir install-tl-unx && \
-#     wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | \
-#       tar -xz -C ./install-tl-unx --strip-components=1 && \
-#     printf "%s\n" \
-#       "TEXDIR ${TL_PATH}" \
-#       "selected_scheme scheme-full" \
-#       "option_doc 0" \
-#       "option_src 0" \
-#       > ./install-tl-unx/texlive.profile && \
-#     ./install-tl-unx/install-tl \
-#       -profile ./install-tl-unx/texlive.profile && \
-#     rm -rf *
 
 # Set up Japanese fonts
 ENV PATH $PATH:/usr/local/texlive/bin/aarch64-linux/:/usr/local/texlive/bin/x86_64-linux/
