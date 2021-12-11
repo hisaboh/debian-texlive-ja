@@ -1,7 +1,7 @@
 FROM debian:10-slim
 LABEL maintainer="hisaboh@gmail.com"
 
-ENV TL_VERSION=2020
+ENV TL_VERSION=2021
 ENV TL_PATH         /usr/local/texlive
 ENV PATH            ${TL_PATH}/bin/x86_64-linux:/bin:${PATH}
 
@@ -23,20 +23,33 @@ RUN apt-get update && \
     rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 # Install TeX Live
-RUN mkdir install-tl-unx && \
-    wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | \
-      tar -xz -C ./install-tl-unx --strip-components=1 && \
-    printf "%s\n" \
+RUN mkdir install-tl-unx
+RUN wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | \
+      tar -xz -C ./install-tl-unx --strip-components=1
+RUN printf "%s\n" \
       "TEXDIR ${TL_PATH}" \
       "selected_scheme scheme-full" \
       "option_doc 0" \
       "option_src 0" \
-      > ./install-tl-unx/texlive.profile && \
-    ./install-tl-unx/install-tl \
-      -profile ./install-tl-unx/texlive.profile && \
-    rm -rf *
+      > ./install-tl-unx/texlive.profile
+RUN ./install-tl-unx/install-tl \
+      -profile ./install-tl-unx/texlive.profile
+RUN rm -rf *
+# RUN mkdir install-tl-unx && \
+#     wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | \
+#       tar -xz -C ./install-tl-unx --strip-components=1 && \
+#     printf "%s\n" \
+#       "TEXDIR ${TL_PATH}" \
+#       "selected_scheme scheme-full" \
+#       "option_doc 0" \
+#       "option_src 0" \
+#       > ./install-tl-unx/texlive.profile && \
+#     ./install-tl-unx/install-tl \
+#       -profile ./install-tl-unx/texlive.profile && \
+#     rm -rf *
 
 # Set up Japanese fonts
+ENV PATH $PATH:/usr/local/texlive/bin/aarch64-linux/:/usr/local/texlive/bin/x86_64-linux/
 RUN tlmgr install \
       collection-latexextra \
       collection-fontsrecommended \
@@ -56,8 +69,12 @@ RUN tlmgr install \
    japanese-otf-uptex-nonfree \
    ptex-fontmaps-macos \
    cjk-gs-integrate-macos
-RUN cjk-gs-integrate-macos --cleanup --force
-RUN cjk-gs-integrate-macos --link-texmf --force \
+
+# RUN cjk-gs-integrate-macos --cleanup --force
+# RUN cjk-gs-integrate-macos --link-texmf --force \
+#   --fontdef-add=$(kpsewhich -var-value=TEXMFDIST)/fonts/misc/cjk-gs-integrate-macos/cjkgs-macos-highsierra.dat
+RUN /usr/local/texlive/texmf-dist/scripts/cjk-gs-integrate-macos/cjk-gs-integrate-macos.pl --cleanup --force
+RUN /usr/local/texlive/texmf-dist/scripts/cjk-gs-integrate-macos/cjk-gs-integrate-macos.pl --link-texmf --force \
   --fontdef-add=$(kpsewhich -var-value=TEXMFDIST)/fonts/misc/cjk-gs-integrate-macos/cjkgs-macos-highsierra.dat
 RUN kanji-config-updmap-sys --jis2004 hiragino-highsierra-pron
 RUN luaotfload-tool -u -f
