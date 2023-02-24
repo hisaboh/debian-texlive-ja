@@ -1,4 +1,4 @@
-FROM debian:11.1-slim
+FROM debian:11-slim
 LABEL maintainer="hisaboh@gmail.com"
 
 ENV TL_VERSION=2021
@@ -53,9 +53,10 @@ RUN tlmgr pinning add tlcontrib '*'
 RUN tlmgr update --self
 RUN tlmgr install \
    japanese-otf-nonfree \
-   japanese-otf-uptex-nonfree \
    ptex-fontmaps-macos \
    cjk-gs-integrate-macos
+# RUN tlmgr install japanese-otf-uptex-nonfree
+# japanese-otf-uptex-nonfree has been removed? https://github.com/texjporg/japanese-otf-mirror/issues/21
 
 # RUN cjk-gs-integrate-macos --cleanup --force
 # RUN cjk-gs-integrate-macos --link-texmf --force \
